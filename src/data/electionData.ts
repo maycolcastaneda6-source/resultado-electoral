@@ -24,7 +24,7 @@ export const ELECTION_META = {
   location: 'La Recoleta (Cajamarca)',
   title: 'Elecciones Democráticas del Municipio Escolar Sanramonino 2027',
   pollingStation: 'Local La Recoleta (Cajamarca)',
-  date: '6 de noviembre de 2026',
+  date: '19 de noviembre de 2026',
   year: '2027',
   crestUrl: '/assets/aistudio/INSIGNIA_db8811a1.png',
 };

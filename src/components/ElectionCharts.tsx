@@ -107,24 +107,31 @@ export function VoteDistributionDoughnutChart({ mode }: ModeChartProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const isInitialTotal = modeRef.current === 'total';
     const chart = new Chart(canvas, {
       type: 'doughnut',
       data: {
-        labels: [
-          'Lista 1: ACCIÓN "SAN RAMON"',
-          'Lista 2: CAMINO LUMINOSO',
-          'Votos en blanco',
-          'Votos nulos',
-        ],
+        labels: isInitialTotal
+          ? [
+              'Lista 1: ACCIÓN "SAN RAMON"',
+              'Lista 2: CAMINO LUMINOSO',
+              'Votos en blanco',
+              'Votos nulos',
+            ]
+          : ['Lista 1: ACCIÓN "SAN RAMON"', 'Lista 2: CAMINO LUMINOSO'],
         datasets: [
           {
-            data: [
-              CANDIDATE_LISTS[0].votes,
-              CANDIDATE_LISTS[1].votes,
-              ELECTION_TOTALS.blankVotes,
-              ELECTION_TOTALS.nullVotes,
-            ],
-            backgroundColor: ['#0284c7', '#0d9488', '#94a3b8', '#dc4c4c'],
+            data: isInitialTotal
+              ? [
+                  CANDIDATE_LISTS[0].votes,
+                  CANDIDATE_LISTS[1].votes,
+                  ELECTION_TOTALS.blankVotes,
+                  ELECTION_TOTALS.nullVotes,
+                ]
+              : [CANDIDATE_LISTS[0].votes, CANDIDATE_LISTS[1].votes],
+            backgroundColor: isInitialTotal
+              ? ['#0284c7', '#0d9488', '#94a3b8', '#dc4c4c']
+              : ['#0284c7', '#0d9488'],
             borderWidth: 2,
             borderColor: '#ffffff',
           },
