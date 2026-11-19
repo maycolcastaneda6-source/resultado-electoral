@@ -1,0 +1,870 @@
+Aquí tienes el código completo en un **único archivo HTML** (con CSS y JavaScript integrados y **Chart.js** desde CDN) listo para guardar como `dashboard_elecciones.html` y abrir en cualquier navegador desde computadora, tablet o celular.
+
+``` html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultados Electorales — I.E.E. "SAN RAMÓN"</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --accent: #059669;
+      --accent-bg: #ecfdf5;
+      --accent-border: #a7f3d0;
+      --lista1: #2563eb;
+      --lista2: #059669;
+      --blanco: #94a3b8;
+      --nulo: #ef4444;
+      --ausente: #cbd5e1;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px 16px 40px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 1. Encabezado */
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-info .institution {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #bfdbfe;
+      margin-bottom: 4px;
+    }
+
+    .header-info h1 {
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .meta-pill {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .meta-pill strong {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Barra de control / Selector */
+    .controls-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .controls-label {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      gap: 4px;
+    }
+
+    .segmented-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .segmented-btn:hover {
+      color: var(--text);
+    }
+
+    .segmented-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(30, 58, 138, 0.25);
+    }
+
+    /* 3. Tarjeta destacada de la lista ganadora */
+    .winner-card {
+      background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 65%);
+      border: 2px solid var(--accent-border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .winner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    .winner-title {
+      font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+      font-weight: 800;
+      color: #064e3b;
+      margin-bottom: 4px;
+    }
+
+    .winner-candidate {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .winner-candidate strong {
+      color: var(--text);
+    }
+
+    .winner-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .winner-stat-box {
+      background: #ffffff;
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 125px;
+    }
+
+    .winner-stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.15;
+    }
+
+    .winner-stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* 2. Tarjetas KPI */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 4px solid var(--primary-light);
+    }
+
+    .kpi-card.kpi-green { border-top-color: var(--accent); }
+    .kpi-card.kpi-amber { border-top-color: #d97706; }
+    .kpi-card.kpi-slate { border-top-color: var(--blanco); }
+    .kpi-card.kpi-red { border-top-color: var(--nulo); }
+
+    .kpi-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* 4, 5, 6. Gráficos */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 260px;
+      width: 100%;
+    }
+
+    /* 7. Tabla de detalle */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      min-width: 620px;
+    }
+
+    thead th {
+      background: var(--surface-alt);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+
+    thead th.num,
+    tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr.winner-row {
+      background-color: #f0fdf4;
+    }
+
+    .list-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 0.85rem;
+    }
+
+    .list-1-bg { background: var(--lista1); }
+    .list-2-bg { background: var(--lista2); }
+
+    .list-name {
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag-winner {
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .col-highlight {
+      background-color: rgba(30, 58, 138, 0.06);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Responsividad */
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .charts-grid .card:last-child {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .winner-card {
+        grid-template-columns: 1fr;
+      }
+      .winner-stats {
+        justify-content: flex-start;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .charts-grid .card:last-child {
+        grid-column: span 1;
+      }
+      .header {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 1. Encabezado -->
+    <header class="header">
+      <div class="header-info">
+        <div class="institution">I.E.E. "SAN RAMÓN" — La Recoleta (Cajamarca)</div>
+        <h1>Elecciones Democráticas del Municipio Escolar Sanramonino 2027</h1>
+      </div>
+      <div class="header-meta">
+        <div class="meta-pill">Mesa: <strong>Local La Recoleta (Cajamarca)</strong></div>
+        <div class="meta-pill">Fecha: <strong>6 de noviembre de 2026</strong></div>
+      </div>
+    </header>
+
+    <!-- 8. Selector de modo de porcentaje -->
+    <section class="controls-bar" aria-label="Selector de cálculo de porcentaje">
+      <span class="controls-label">Visualización de porcentajes en gráficos y tabla:</span>
+      <div class="segmented-control" role="group" aria-label="Base porcentual">
+        <button type="button" class="segmented-btn active" id="btnTotal" data-mode="total">
+          % sobre el total de votos (561)
+        </button>
+        <button type="button" class="segmented-btn" id="btnValid" data-mode="valid">
+          % sobre votos válidos (488)
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. Tarjeta destacada de la lista ganadora -->
+    <section class="winner-card" aria-label="Lista ganadora">
+      <div>
+        <div class="winner-badge">Lista Ganadora • Lista 2</div>
+        <h2 class="winner-title">CAMINO LUMINOSO</h2>
+        <p class="winner-candidate">Candidato: <strong>ROJAS ROBLES, YEIRU</strong></p>
+      </div>
+      <div class="winner-stats">
+        <div class="winner-stat-box">
+          <div class="winner-stat-value">274</div>
+          <div class="winner-stat-label">Votos obtenidos</div>
+        </div>
+        <div class="winner-stat-box">
+          <div class="winner-stat-value" id="winnerPctValue">48.84%</div>
+          <div class="winner-stat-label" id="winnerPctLabel">% del total emitido</div>
+        </div>
+        <div class="winner-stat-box">
+          <div class="winner-stat-value">+60</div>
+          <div class="winner-stat-label">Diferencia de votos</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Tarjetas de indicadores (KPI) -->
+    <section class="kpi-grid" aria-label="Indicadores generales">
+      <div class="kpi-card">
+        <div class="kpi-label">Electores hábiles</div>
+        <div class="kpi-value">720</div>
+        <div class="kpi-sub">Padrón electoral</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Votos emitidos</div>
+        <div class="kpi-value">561</div>
+        <div class="kpi-sub">Total en urna</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Participación</div>
+        <div class="kpi-value">77.92%</div>
+        <div class="kpi-sub">561 de 720 electores</div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-label">Ausentismo</div>
+        <div class="kpi-value">159</div>
+        <div class="kpi-sub">22.08% del padrón</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Votos válidos</div>
+        <div class="kpi-value">488</div>
+        <div class="kpi-sub">86.99% de emitidos</div>
+      </div>
+      <div class="kpi-card kpi-slate">
+        <div class="kpi-label">Votos en blanco</div>
+        <div class="kpi-value">29</div>
+        <div class="kpi-sub">5.17% de emitidos</div>
+      </div>
+      <div class="kpi-card kpi-red">
+        <div class="kpi-label">Votos nulos</div>
+        <div class="kpi-value">44</div>
+        <div class="kpi-sub">7.84% de emitidos</div>
+      </div>
+    </section>
+
+    <!-- 4, 5 y 6. Gráficos -->
+    <section class="charts-grid" aria-label="Gráficos electorales">
+      <!-- 4. Gráfico de barras -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Votos por lista</h3>
+          <p class="card-subtitle" id="barSubtitle">Comparativa directa (en votos y % sobre el total)</p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 5. Gráfico de dona: distribución de votos -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title" id="donutTitle">Distribución de los 561 votos emitidos</h3>
+          <p class="card-subtitle" id="donutSubtitle">Incluye listas, votos en blanco y nulos</p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="distributionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 6. Gráfico de dona: asistencia -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Asistencia electoral</h3>
+          <p class="card-subtitle">Votaron (561) vs. Ausentes (159) sobre 720 hábiles</p>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="attendanceChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Tabla de detalle por lista -->
+    <section class="card" aria-label="Tabla de detalle por lista">
+      <div class="card-header">
+        <h3 class="card-title">Detalle de resultados por lista</h3>
+        <p class="card-subtitle" id="tableSubtitle">Columna resaltada: % del total de votos emitidos (561)</p>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Lista</th>
+              <th>Candidato</th>
+              <th class="num">Votos</th>
+              <th class="num col-highlight" id="thTotal">% del total</th>
+              <th class="num" id="thValid">% de válidos</th>
+            </tr>
+          </thead>
+          <tbody id="resultsTableBody">
+            <!-- Generado por JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      I.E.E. "SAN RAMÓN" — Local La Recoleta (Cajamarca) • Elecciones del Municipio Escolar Sanramonino 2027
+    </footer>
+  </div>
+
+  <script>
+    const electionData = {
+      totalIssued: 561,
+      validVotes: 488,
+      blankVotes: 29,
+      nullVotes: 44,
+      eligibleVoters: 720,
+      absentVoters: 159,
+      lists: [
+        {
+          number: 1,
+          name: 'ACCIÓN "SAN RAMON"',
+          candidate: "GOICOCHEA GUTIERREZ, JEFERSON MANUEL",
+          votes: 214,
+          pctTotal: 38.15,
+          pctValid: 43.85,
+          color: "#2563eb",
+          winner: false
+        },
+        {
+          number: 2,
+          name: "CAMINO LUMINOSO",
+          candidate: "ROJAS ROBLES, YEIRU",
+          votes: 274,
+          pctTotal: 48.84,
+          pctValid: 56.15,
+          color: "#059669",
+          winner: true
+        }
+      ]
+    };
+
+    let currentMode = "total"; // "total" | "valid"
+
+    const btnTotal = document.getElementById("btnTotal");
+    const btnValid = document.getElementById("btnValid");
+    const winnerPctValue = document.getElementById("winnerPctValue");
+    const winnerPctLabel = document.getElementById("winnerPctLabel");
+    const barSubtitle = document.getElementById("barSubtitle");
+    const donutTitle = document.getElementById("donutTitle");
+    const donutSubtitle = document.getElementById("donutSubtitle");
+    const tableSubtitle = document.getElementById("tableSubtitle");
+    const thTotal = document.getElementById("thTotal");
+    const thValid = document.getElementById("thValid");
+    const tableBody = document.getElementById("resultsTableBody");
+
+    // 4. Gráfico de barras: Votos por lista
+    const barCtx = document.getElementById("barChart").getContext("2d");
+    const barChart = new Chart(barCtx, {
+      type: "bar",
+      data: {
+        labels: electionData.lists.map((l) => `Lista ${l.number}: ${l.name}`),
+        datasets: [
+          {
+            label: "Votos",
+            data: electionData.lists.map((l) => l.votes),
+            backgroundColor: electionData.lists.map((l) => l.color),
+            borderRadius: 8,
+            maxBarThickness: 64
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const list = electionData.lists[ctx.dataIndex];
+                const pct = currentMode === "total" ? list.pctTotal : list.pctValid;
+                const base = currentMode === "total" ? "del total" : "de válidos";
+                return `${list.votes} votos (${pct.toFixed(2)}% ${base})`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 320,
+            grid: { color: "#f1f5f9" },
+            title: { display: true, text: "Cantidad de votos", color: "#64748b", font: { size: 11 } }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+    // 5. Gráfico de dona: Distribución de votos
+    const distCtx = document.getElementById("distributionChart").getContext("2d");
+    const distributionChart = new Chart(distCtx, {
+      type: "doughnut",
+      data: {
+        labels: [
+          'Lista 1: ACCIÓN "SAN RAMON"',
+          "Lista 2: CAMINO LUMINOSO",
+          "Votos en blanco",
+          "Votos nulos"
+        ],
+        datasets: [
+          {
+            data: [214, 274, 29, 44],
+            backgroundColor: ["#2563eb", "#059669", "#94a3b8", "#ef4444"],
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { boxWidth: 12, padding: 12, font: { size: 11 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const val = ctx.raw;
+                const denom = currentMode === "total" ? electionData.totalIssued : electionData.validVotes;
+                const pct = ((val / denom) * 100).toFixed(2);
+                const base = currentMode === "total" ? "del total" : "de válidos";
+                return `${ctx.label}: ${val} votos (${pct}% ${base})`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // 6. Gráfico de dona: Asistencia
+    const attCtx = document.getElementById("attendanceChart").getContext("2d");
+    new Chart(attCtx, {
+      type: "doughnut",
+      data: {
+        labels: ["Votaron (561)", "Ausentes (159)"],
+        datasets: [
+          {
+            data: [electionData.totalIssued, electionData.absentVoters],
+            backgroundColor: ["#1e3a8a", "#cbd5e1"],
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { boxWidth: 12, padding: 14, font: { size: 12 } }
+          },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const val = ctx.raw;
+                const pct = ((val / electionData.eligibleVoters) * 100).toFixed(2);
+                return `${ctx.label.split(" ")[0]}: ${val} electores (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    function renderTable() {
+      tableBody.innerHTML = electionData.lists
+        .map((list) => {
+          const totalClass = currentMode === "total" ? "num col-highlight" : "num";
+          const validClass = currentMode === "valid" ? "num col-highlight" : "num";
+          const rowClass = list.winner ? "winner-row" : "";
+          const badgeClass = list.number === 1 ? "list-1-bg" : "list-2-bg";
+          const winnerTag = list.winner ? '<span class="tag-winner">Ganadora</span>' : "";
+
+          return `
+            <tr class="${rowClass}">
+              <td><span class="list-badge ${badgeClass}">${list.number}</span></td>
+              <td>
+                <div class="list-name">
+                  <span>${list.name}</span>
+                  ${winnerTag}
+                </div>
+              </td>
+              <td>${list.candidate}</td>
+              <td class="num"><strong>${list.votes}</strong></td>
+              <td class="${totalClass}">${list.pctTotal.toFixed(2)}%</td>
+              <td class="${validClass}">${list.pctValid.toFixed(2)}%</td>
+            </tr>
+          `;
+        })
+        .join("");
+    }
+
+    function updateMode(mode) {
+      currentMode = mode;
+      const isTotal = mode === "total";
+
+      btnTotal.classList.toggle("active", isTotal);
+      btnValid.classList.toggle("active", !isTotal);
+
+      // Actualizar tarjeta ganadora
+      const winner = electionData.lists[1];
+      winnerPctValue.textContent = isTotal
+        ? `${winner.pctTotal.toFixed(2)}%`
+        : `${winner.pctValid.toFixed(2)}%`;
+      winnerPctLabel.textContent = isTotal
+        ? "% del total emitido"
+        : "% de votos válidos";
+
+      // Actualizar subtítulos
+      barSubtitle.textContent = isTotal
+        ? "Comparativa directa (en votos y % sobre el total de 561)"
+        : "Comparativa directa (en votos y % sobre 488 votos válidos)";
+
+      // Actualizar gráfico de distribución
+      if (isTotal) {
+        donutTitle.textContent = "Distribución de los 561 votos emitidos";
+        donutSubtitle.textContent = "Incluye listas, votos en blanco y nulos";
+        distributionChart.data.labels = [
+          'Lista 1: ACCIÓN "SAN RAMON"',
+          "Lista 2: CAMINO LUMINOSO",
+          "Votos en blanco",
+          "Votos nulos"
+        ];
+        distributionChart.data.datasets[0].data = [214, 274, 29, 44];
+        distributionChart.data.datasets[0].backgroundColor = [
+          "#2563eb",
+          "#059669",
+          "#94a3b8",
+          "#ef4444"
+        ];
+      } else {
+        donutTitle.textContent = "Distribución de los 488 votos válidos";
+        donutSubtitle.textContent = "Excluye votos en blanco (29) y nulos (44)";
+        distributionChart.data.labels = [
+          'Lista 1: ACCIÓN "SAN RAMON"',
+          "Lista 2: CAMINO LUMINOSO"
+        ];
+        distributionChart.data.datasets[0].data = [214, 274];
+        distributionChart.data.datasets[0].backgroundColor = ["#2563eb", "#059669"];
+      }
+
+      distributionChart.update();
+      barChart.update();
+
+      // Actualizar encabezados y filas de la tabla
+      thTotal.classList.toggle("col-highlight", isTotal);
+      thValid.classList.toggle("col-highlight", !isTotal);
+      tableSubtitle.textContent = isTotal
+        ? "Columna resaltada: % del total de votos emitidos (561)"
+        : "Columna resaltada: % sobre votos válidos (488)";
+
+      renderTable();
+    }
+
+    btnTotal.addEventListener("click", () => updateMode("total"));
+    btnValid.addEventListener("click", () => updateMode("valid"));
+
+    // Inicialización
+    renderTable();
+  </script>
+</body>
+</html>
+
+```
+
+### Características incluidas
+
+  - **Un solo archivo HTML** con estilos CSS responsivos (adaptable a computadora, tablet y celular) y **Chart.js** cargado desde CDN.
+  - **Selector interactivo** en la parte superior para alternar entre **"% sobre el total de votos (561)"** y **"% sobre votos válidos (488)"**, actualizando en tiempo real la tarjeta de la lista ganadora, los *tooltips* y segmentos del gráfico de dona, y el resaltado de la tabla.
+  - **Todos los indicadores y datos exactos**: los 7 KPIs, la tarjeta destacada de **CAMINO LUMINOSO** con su diferencia de **+60 votos**, los 3 gráficos solicitados y la tabla completa de resultados por lista.

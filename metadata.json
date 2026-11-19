@@ -1,0 +1,6 @@
+{
+  "name": "Resultados Electorales — I.E.E. San Ramón",
+  "description": "Dashboard interactivo de resultados electorales del Municipio Escolar Sanramonino 2027 - I.E.E. San Ramón, La Recoleta (Cajamarca).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
