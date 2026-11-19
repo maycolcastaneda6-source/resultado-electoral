@@ -35,8 +35,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f4f8fb] text-slate-900">
       {/* Top Bar Contract: 3 zones — Wordmark | 4 single-line links | 1 primary action */}
-      <header className="no-print sticky top-0 z-20 border-b border-sky-200/80 bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-8 px-4 py-3 sm:px-6">
+      <header className="no-print md:sticky md:top-0 z-20 border-b border-sky-200/80 bg-white/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:gap-8 sm:px-6">
           <a
             href="#resumen"
             className="flex items-center gap-2.5 font-display text-base font-extrabold tracking-tight text-sky-950 whitespace-nowrap shrink-0"
@@ -87,13 +87,43 @@ export default function App() {
             <button
               type="button"
               onClick={downloadResultsCsv}
-              className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 whitespace-nowrap shrink-0 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 whitespace-nowrap shrink-0 cursor-pointer sm:px-4"
             >
               <Download className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Exportar CSV</span>
             </button>
           </div>
         </div>
+
+        <nav
+          aria-label="Navegación móvil de secciones"
+          className="flex items-center justify-between gap-4 overflow-x-auto border-t border-sky-100 px-4 py-2.5 text-xs font-medium text-slate-600 md:hidden"
+        >
+          <a
+            href="#resumen"
+            className="hover:text-sky-800 whitespace-nowrap shrink-0"
+          >
+            Resumen
+          </a>
+          <a
+            href="#indicadores"
+            className="hover:text-sky-800 whitespace-nowrap shrink-0"
+          >
+            Indicadores
+          </a>
+          <a
+            href="#graficos"
+            className="hover:text-sky-800 whitespace-nowrap shrink-0"
+          >
+            Gráficos
+          </a>
+          <a
+            href="#resultados"
+            className="hover:text-sky-800 whitespace-nowrap shrink-0"
+          >
+            Resultados
+          </a>
+        </nav>
       </header>
 
       <main className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
@@ -101,7 +131,7 @@ export default function App() {
         <section
           id="resumen"
           aria-label="Encabezado electoral"
-          className="rounded-xl border border-sky-200 bg-gradient-to-br from-[#e0f2fe] via-[#eff8ff] to-white px-6 py-6 text-slate-900 sm:px-8 sm:py-7"
+          className="scroll-mt-20 rounded-xl border border-sky-200 bg-gradient-to-br from-[#e0f2fe] via-[#eff8ff] to-white px-6 py-6 text-slate-900 sm:px-8 sm:py-7"
         >
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4 sm:gap-5">
@@ -255,7 +285,7 @@ export default function App() {
         </section>
 
         {/* 4. Tarjetas de Indicadores (KPI) */}
-        <section id="indicadores" aria-label="Indicadores generales">
+        <section id="indicadores" aria-label="Indicadores generales" className="scroll-mt-20">
           <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4 lg:grid-cols-7">
             {KPI_METRICS.map((kpi) => (
               <div
@@ -280,7 +310,7 @@ export default function App() {
         <section
           id="graficos"
           aria-label="Gráficos electorales"
-          className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
+          className="scroll-mt-20 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
         >
           {/* Gráfico 1: Barras */}
           <article className="flex flex-col rounded-xl border border-slate-200 bg-white p-5">
@@ -338,7 +368,7 @@ export default function App() {
         <section
           id="resultados"
           aria-label="Tabla de detalle por lista"
-          className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6"
+          className="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-5 sm:p-6"
         >
           <header className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
             <div>
